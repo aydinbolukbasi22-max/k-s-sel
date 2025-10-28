@@ -1,61 +1,54 @@
-from datetime import datetime
-
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from datetime import datetime
 
-from config import Config
-
+# Uzantılar
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
 
+def create_app(config_class=None):
+    """Flask uygulama örneğini oluşturur ve döndürür."""
+    app = Flask(__name__)
 
-def turkce_tarih(value):
-    """Tarih alanlarını Türkçe biçimde döndürür."""
-    if isinstance(value, datetime):
-        return value.strftime("%d/%m/%Y")
-    return value
+    if config_class is None:
+        from config import Config
+        app.config.from_object(Config)
+    else:
+        app.config.from_object(config_class)
 
-
-def create_app(config_class: type[Config] = Config) -> Flask:
-    """Flask uygulamasını oluşturur ve yapılandırır."""
-
-    uygulama = Flask(__name__)
-    uygulama.config.from_object(config_class)
-
-    db.init_app(uygulama)
-    login_manager.init_app(uygulama)
-    migrate.init_app(uygulama, db)
-    csrf.init_app(uygulama)
+    db.init_app(app)
+    login_manager.init_app(app)
+    migrate.init_app(app, db)
+    csrf.init_app(app)
 
     login_manager.login_view = "auth.giris"
     login_manager.login_message = "Lütfen önce oturum açın."
 
-    uygulama.add_template_filter(turkce_tarih, name="turkce_tarih")
+    @app.template_filter("turkce_tarih")
+    def turkce_tarih(value):
+        if isinstance(value, datetime):
+            return value.strftime("%d/%m/%Y")
+        return value
 
-    from .routes.auth import auth_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.dashboard import dashboard_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.accounts import accounts_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.transactions import transactions_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.categories import categories_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.budgets import budgets_bp  # noqa: E402  pylint: disable=import-outside-toplevel
-    from .routes.reports import reports_bp  # noqa: E402  pylint: disable=import-outside-toplevel
+    from .routes.auth import auth_bp
+    from .routes.dashboard import dashboard_bp
+    from .routes.accounts import accounts_bp
+    from .routes.transactions import transactions_bp
+    from .routes.categories import categories_bp
+    from .routes.budgets import budgets_bp
+    from .routes.reports import reports_bp
 
-    uygulama.register_blueprint(auth_bp)
-    uygulama.register_blueprint(dashboard_bp)
-    uygulama.register_blueprint(accounts_bp)
-    uygulama.register_blueprint(transactions_bp)
-    uygulama.register_blueprint(categories_bp)
-    uygulama.register_blueprint(budgets_bp)
-    uygulama.register_blueprint(reports_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(accounts_bp)
+    app.register_blueprint(transactions_bp)
+    app.register_blueprint(categories_bp)
+    app.register_blueprint(budgets_bp)
+    app.register_blueprint(reports_bp)
 
-    return uygulama
-
-
-app = create_app()
-
-__all__ = ("app", "db", "login_manager", "migrate", "csrf", "create_app")
+    return app
