@@ -1,0 +1,1 @@
+"""Uygulama yönlendirme paketini başlatır."""

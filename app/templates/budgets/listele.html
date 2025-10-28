@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Bütçeler{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Bütçe Tanımla</h2>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.kategori_id.label(class="form-label") }}
+            {{ form.kategori_id(class="form-select") }}
+            {% for hata in form.kategori_id.errors %}
+              <div class="text-danger small">{{ hata }}</div>
+            {% endfor %}
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              {{ form.yil.label(class="form-label") }}
+              {{ form.yil(class="form-control") }}
+              {% for hata in form.yil.errors %}
+                <div class="text-danger small">{{ hata }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-6">
+              {{ form.ay.label(class="form-label") }}
+              {{ form.ay(class="form-select") }}
+              {% for hata in form.ay.errors %}
+                <div class="text-danger small">{{ hata }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3 mt-3">
+            {{ form.tutar.label(class="form-label") }}
+            {{ form.tutar(class="form-control") }}
+            {% for hata in form.tutar.errors %}
+              <div class="text-danger small">{{ hata }}</div>
+            {% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Tanımlı Bütçeler</h2>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Dönem</th>
+                <th>Kategori</th>
+                <th>Tutar</th>
+                <th>Kalan</th>
+                <th class="text-end">İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for butce in butceler %}
+                {% set kalan = butce.kalan_tutar %}
+                <tr class="{{ 'table-danger' if kalan < 0 else '' }}">
+                  <td>{{ '%02d/%s'|format(butce.ay, butce.yil) }}</td>
+                  <td>{{ butce.kategori.ad }}</td>
+                  <td>₺{{ '%.2f'|format(butce.tutar) }}</td>
+                  <td>₺{{ '%.2f'|format(kalan) }}</td>
+                  <td class="text-end">
+                    <form method="post" action="{{ url_for('budgets.sil', butce_id=butce.id) }}" onsubmit="return confirm('Bütçeyi silmek istediğinize emin misiniz?');">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button class="btn btn-sm btn-outline-danger">Sil</button>
+                    </form>
+                  </td>
+                </tr>
+              {% else %}
+                <tr><td colspan="5">Henüz bütçe tanımlanmadı.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
