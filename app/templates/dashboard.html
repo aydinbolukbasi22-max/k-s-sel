@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Genel Bakış{% endblock %}
+{% block content %}
+<h1 class="mb-4">Aylık Finansal Özet</h1>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card card-ozet border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Gelir</h2>
+        <p class="display-6 text-success">₺{{ '%.2f'|format(toplam_gelir) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-ozet border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Gider</h2>
+        <p class="display-6 text-danger">₺{{ '%.2f'|format(toplam_gider) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-ozet border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Net Durum</h2>
+        <p class="display-6 {{ 'text-success' if net_durum >= 0 else 'text-danger' }}">₺{{ '%.2f'|format(net_durum) }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <strong>Hesap Bakiyeleri</strong>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for hesap in hesaplar %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ hesap.ad }} <small class="text-muted">({{ hesap.hesap_turu|capitalize }})</small></span>
+            <span class="fw-semibold">₺{{ '%.2f'|format(hesap.bakiye) }}</span>
+          </li>
+        {% else %}
+          <li class="list-group-item">Henüz hesap bulunmuyor.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">
+        <strong>Gider Dağılımı</strong>
+      </div>
+      <div class="card-body">
+        <canvas id="giderGrafik" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <strong>{{ ay_adi }} {{ bugun.year }} Bütçeleri</strong>
+    <a href="{{ url_for('budgets.listele') }}" class="btn btn-sm btn-outline-primary">Tüm Bütçeler</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Kategori</th>
+          <th>Bütçe Tutarı</th>
+          <th>Kalan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for butce in butceler %}
+          {% set kalan = butce.kalan_tutar %}
+          <tr class="{{ 'table-danger' if kalan < 0 else '' }}">
+            <td>{{ butce.kategori.ad }}</td>
+            <td>₺{{ '%.2f'|format(butce.tutar) }}</td>
+            <td>
+              ₺{{ '%.2f'|format(kalan) }}
+              {% if kalan < 0 %}
+                <span class="badge bg-danger ms-2">Bütçe aşıldı!</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3">Bu ay için tanımlı bütçe bulunmuyor.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block ek_js %}
+<script>
+  const grafikVerisi = {{ grafik_verisi|tojson }};
+  const ctx = document.getElementById('giderGrafik');
+  if (ctx && grafikVerisi.etiketler.length > 0) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: grafikVerisi.etiketler,
+        datasets: [{
+          data: grafikVerisi.degerler,
+          backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6f42c1', '#198754', '#fd7e14'],
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}
