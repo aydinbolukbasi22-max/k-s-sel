@@ -1,0 +1,69 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Kategoriler{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Yeni Kategori</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.ad.label(class="form-label") }}
+            {{ form.ad(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.tur.label(class="form-label") }}
+            {{ form.tur(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.renk.label(class="form-label") }}
+            {{ form.renk(class="form-control", placeholder="#0d6efd") }}
+          </div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Gelir Kategorileri</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for kategori in gelir_kategorileri %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><span class="renk-badge" style="background: {{ kategori.renk }}"></span>{{ kategori.ad }}</span>
+              <span class="badge bg-success">Gelir</span>
+            </li>
+            {% else %}
+            <li class="list-group-item">Tanımlı gelir kategorisi yok.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Gider Kategorileri</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for kategori in gider_kategorileri %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><span class="renk-badge" style="background: {{ kategori.renk }}"></span>{{ kategori.ad }}</span>
+              <span class="badge bg-danger">Gider</span>
+            </li>
+            {% else %}
+            <li class="list-group-item">Tanımlı gider kategorisi yok.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

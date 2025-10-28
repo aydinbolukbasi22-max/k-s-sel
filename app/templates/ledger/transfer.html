@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Hesaplar Arası Transfer{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Transfer Oluştur</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.tarih.label(class="form-label") }}
+            {{ form.tarih(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.kaynak_hesap_id.label(class="form-label") }}
+            {{ form.kaynak_hesap_id(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.hedef_hesap_id.label(class="form-label") }}
+            {{ form.hedef_hesap_id(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.tutar.label(class="form-label") }}
+            {{ form.tutar(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.aciklama.label(class="form-label") }}
+            {{ form.aciklama(class="form-control", rows=3) }}
+          </div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

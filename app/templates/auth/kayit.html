@@ -1,0 +1,46 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Kayıt Ol - Bütçe Rehberi{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">Yeni Hesap Oluştur</div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.ad.label(class="form-label") }}
+            {{ form.ad(class="form-control", placeholder="Adınız Soyadınız") }}
+            {% for hata in form.ad.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.eposta.label(class="form-label") }}
+            {{ form.eposta(class="form-control", placeholder="ornek@posta.com") }}
+            {% for hata in form.eposta.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                {{ form.sifre.label(class="form-label") }}
+                {{ form.sifre(class="form-control", placeholder="Şifreniz") }}
+                {% for hata in form.sifre.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                {{ form.sifre_tekrar.label(class="form-label") }}
+                {{ form.sifre_tekrar(class="form-control", placeholder="Tekrar Şifre") }}
+                {% for hata in form.sifre_tekrar.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            {{ form.gonder(class="btn btn-success") }}
+            <a class="btn btn-outline-secondary" href="{{ url_for('auth.giris') }}">Zaten hesabım var</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

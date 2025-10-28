@@ -1,0 +1,113 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Kontrol Paneli{% endblock %}
+{% block content %}
+<h1 class="mb-4">Merhaba {{ current_user.ad.split(' ')[0] }}!</h1>
+<div class="row g-4">
+  <div class="col-lg-3 col-sm-6">
+    <div class="card shadow-sm border-0 gradient-card gradient-income text-white">
+      <div class="card-body">
+        <h6>Aylık Gelir</h6>
+        <h2 class="fw-bold">₺{{ '%.2f'|format(ozet.gelir) }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="card shadow-sm border-0 gradient-card gradient-expense text-white">
+      <div class="card-body">
+        <h6>Aylık Gider</h6>
+        <h2 class="fw-bold">₺{{ '%.2f'|format(ozet.gider) }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="card shadow-sm border-0 gradient-card gradient-balance text-white">
+      <div class="card-body">
+        <h6>Net Durum</h6>
+        <h2 class="fw-bold">₺{{ '%.2f'|format(ozet.net) }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-sm-6">
+    <div class="card shadow-sm border-0 gradient-card gradient-savings text-white">
+      <div class="card-body">
+        <h6>Toplam Birikim</h6>
+        <h2 class="fw-bold">₺{{ '%.2f'|format(gerceklesme) }}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4 g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Nakit Akış Trendleri</h5>
+        <span class="text-muted small">{{ yil }}</span>
+      </div>
+      <div class="card-body">
+        <canvas id="nakitAkisGrafik" data-source="{{ url_for('analytics.nakit_json') }}"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Hatırlatıcı Durumu</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center">Bugün <span class="badge bg-primary">{{ hatirlatici_durumu.bugun }}</span></li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">Yaklaşan <span class="badge bg-warning text-dark">{{ hatirlatici_durumu.yaklasan }}</span></li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">Geciken <span class="badge bg-danger">{{ hatirlatici_durumu.gecmis }}</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4 g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Hesap Bakiyeleri</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for hesap in hesaplar %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ hesap.ad }}</strong>
+            <div class="small text-muted">{{ hesap.tur.value|replace('_', ' ')|title }}</div>
+          </div>
+          <span class="fw-bold">₺{{ '%.2f'|format(hesap.bakiye) }}</span>
+        </li>
+        {% else %}
+        <li class="list-group-item">Henüz hesap eklenmemiş.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Son İşlemler</h5>
+        <a href="{{ url_for('ledger.islem_listesi') }}" class="btn btn-sm btn-outline-primary">Tümü</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for islem in son_islemler %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ islem.kategori.ad if islem.kategori else 'Diğer' }}</strong>
+            <div class="small text-muted">{{ islem.tarih.strftime('%d/%m/%Y') }} · {{ islem.hesap.ad }}</div>
+          </div>
+          <span class="fw-bold text-{{ 'success' if islem.tur.value == 'gelir' else 'danger' }}">
+            {{ '+' if islem.tur.value == 'gelir' else '-' }}₺{{ '%.2f'|format(islem.tutar) }}
+          </span>
+        </li>
+        {% else %}
+        <li class="list-group-item">Henüz işlem eklenmemiş.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

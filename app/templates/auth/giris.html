@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Giriş Yap - Bütçe Rehberi{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">Giriş Yap</div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.eposta.label(class="form-label") }}
+            {{ form.eposta(class="form-control", placeholder="ornek@posta.com") }}
+            {% for hata in form.eposta.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.sifre.label(class="form-label") }}
+            {{ form.sifre(class="form-control", placeholder="Şifreniz") }}
+            {% for hata in form.sifre.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+          </div>
+          <div class="d-grid gap-2">
+            {{ form.gonder(class="btn btn-primary") }}
+            <a class="btn btn-outline-secondary" href="{{ url_for('auth.kayit') }}">Hesabınız yok mu? Kayıt olun</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

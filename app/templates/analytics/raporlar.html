@@ -1,0 +1,93 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Finansal Analiz{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Finansal Analizler</h1>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Nakit Akışı ({{ yil }})</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="analizNakit" data-source="{{ url_for('analytics.nakit_json') }}" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Kategori Bazlı Giderler</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="analizKategori" data-source="{{ url_for('analytics.harcama_json') }}" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card shadow-sm mt-4">
+  <div class="card-header bg-white">
+    <h5 class="mb-0">Özet Veriler</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Dönem</th>
+          <th class="text-end">Gelir</th>
+          <th class="text-end">Gider</th>
+          <th class="text-end">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for satir in nakit %}
+        <tr>
+          <td>{{ satir.etiket }}</td>
+          <td class="text-end">₺{{ '%.2f'|format(satir.gelir) }}</td>
+          <td class="text-end">₺{{ '%.2f'|format(satir.gider) }}</td>
+          <td class="text-end text-{{ 'success' if satir.gelir - satir.gider >= 0 else 'danger' }}">₺{{ '%.2f'|format(satir.gelir - satir.gider) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  const nakit = document.getElementById('analizNakit');
+  if (nakit) {
+    fetch(nakit.dataset.source)
+      .then(resp => resp.json())
+      .then(data => {
+        new Chart(nakit.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [
+              { label: 'Gelir', data: data.gelir, backgroundColor: '#0ea5e9' },
+              { label: 'Gider', data: data.gider, backgroundColor: '#ef4444' },
+            ],
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      });
+  }
+  const kategori = document.getElementById('analizKategori');
+  if (kategori) {
+    fetch(kategori.dataset.source)
+      .then(resp => resp.json())
+      .then(data => {
+        new Chart(kategori.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: data.labels,
+            datasets: [{ data: data.values, backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#d63384', '#6610f2', '#198754'] }],
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      });
+  }
+})();
+</script>
+{% endblock %}
