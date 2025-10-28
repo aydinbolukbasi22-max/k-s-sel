@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}İşlem Düzenle{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">İşlem Bilgilerini Düzenle</h1>
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="row g-3">
+        <div class="col-md-3">
+          {{ form.islem_turu.label(class="form-label") }}
+          {{ form.islem_turu(class="form-select") }}
+          {% for hata in form.islem_turu.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.hesap_id.label(class="form-label") }}
+          {{ form.hesap_id(class="form-select") }}
+          {% for hata in form.hesap_id.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.kategori_id.label(class="form-label") }}
+          {{ form.kategori_id(class="form-select") }}
+          {% for hata in form.kategori_id.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.tutar.label(class="form-label") }}
+          {{ form.tutar(class="form-control") }}
+          {% for hata in form.tutar.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row g-3 mt-1">
+        <div class="col-md-3">
+          {{ form.tarih.label(class="form-label") }}
+          {{ form.tarih(class="form-control") }}
+          {% for hata in form.tarih.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-9">
+          {{ form.aciklama.label(class="form-label") }}
+          {{ form.aciklama(class="form-control", rows=1) }}
+          {% for hata in form.aciklama.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('transactions.listele') }}" class="btn btn-outline-secondary">İptal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
