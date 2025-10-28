@@ -47,7 +47,7 @@ def duzenle(hesap_id):
     return render_template("accounts/duzenle.html", form=form, hesap=hesap, baslik="Hesap Düzenle")
 
 
-@accounts_bp.post("/<int:hesap_id>/sil")
+@accounts_bp.route("/<int:hesap_id>/sil", methods=["POST"])
 @login_required
 def sil(hesap_id):
     hesap = Hesap.query.filter_by(id=hesap_id, kullanici_id=current_user.id).first_or_404()

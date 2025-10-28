@@ -39,7 +39,7 @@
                 <div class="small text-muted">{{ kategori.aciklama or 'Açıklama yok.' }}</div>
               </div>
               <form method="post" action="{{ url_for('categories.sil', kategori_id=kategori.id) }}" onsubmit="return confirm('Kategoriyi silmek istediğinize emin misiniz?');">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {{ csrf_token() }}
                 <button class="btn btn-sm btn-outline-danger">Sil</button>
               </form>
             </div>
