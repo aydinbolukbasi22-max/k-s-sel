@@ -9,9 +9,8 @@ def get_secret_key():
 
 class Config:
     SECRET_KEY = get_secret_key()
-    varsayılan_db_yolu = (BASE_DIR / "veritabani.db").resolve().as_posix()
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
-        f"sqlite:///{varsayılan_db_yolu}"
+        f"sqlite:///{BASE_DIR / 'veritabani.db'}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
