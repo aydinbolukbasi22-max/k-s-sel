@@ -45,12 +45,6 @@ class HesapFormu(FlaskForm):
     submit = SubmitField("Kaydet")
 
 
-class SilmeFormu(FlaskForm):
-    """Sadece CSRF koruması için kullanılan form."""
-
-    pass
-
-
 class KategoriFormu(FlaskForm):
     ad = StringField("Kategori Adı", validators=[DataRequired(), Length(max=120)])
     aciklama = TextAreaField("Açıklama", validators=[Optional(), Length(max=255)])

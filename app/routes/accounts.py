@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from .. import db
-from ..forms import HesapFormu, SilmeFormu
+from ..forms import HesapFormu
 from ..models import Hesap
 
 
@@ -13,7 +13,6 @@ accounts_bp = Blueprint("accounts", __name__, url_prefix="/hesaplar")
 @login_required
 def listele():
     form = HesapFormu()
-    silme_form = SilmeFormu()
     hesaplar = Hesap.query.filter_by(kullanici_id=current_user.id).all()
 
     if form.validate_on_submit():
@@ -28,13 +27,7 @@ def listele():
         flash("Hesap başarıyla eklendi.", "success")
         return redirect(url_for("accounts.listele"))
 
-    return render_template(
-        "accounts/listele.html",
-        form=form,
-        hesaplar=hesaplar,
-        silme_form=silme_form,
-        baslik="Hesaplar",
-    )
+    return render_template("accounts/listele.html", form=form, hesaplar=hesaplar, baslik="Hesaplar")
 
 
 @accounts_bp.route("/<int:hesap_id>/duzenle", methods=["GET", "POST"])
@@ -54,14 +47,9 @@ def duzenle(hesap_id):
     return render_template("accounts/duzenle.html", form=form, hesap=hesap, baslik="Hesap Düzenle")
 
 
-@accounts_bp.post("/<int:hesap_id>/sil")
+@accounts_bp.route("/<int:hesap_id>/sil", methods=["POST"])
 @login_required
 def sil(hesap_id):
-    form = SilmeFormu()
-    if not form.validate_on_submit():
-        flash("İstek doğrulanamadı. Lütfen tekrar deneyin.", "danger")
-        return redirect(url_for("accounts.listele"))
-
     hesap = Hesap.query.filter_by(id=hesap_id, kullanici_id=current_user.id).first_or_404()
     db.session.delete(hesap)
     db.session.commit()
