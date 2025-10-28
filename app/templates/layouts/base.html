@@ -1,0 +1,68 @@
+{% macro aktif(path) %}{% if request.path.startswith(path) %}active{% endif %}{% endmacro %}
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Bütçe Rehberi{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{{ url_for('dashboard.ozet') }}">Bütçe Rehberi</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          {% if current_user.is_authenticated %}
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link {{ aktif('/defter/hesaplar') }}" href="{{ url_for('ledger.hesap_listesi') }}">Hesaplar</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/defter/islemler') }}" href="{{ url_for('ledger.islem_listesi') }}">İşlemler</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/butce') }}" href="{{ url_for('budgeting.planlar') }}">Bütçeler</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/hedefler') }}" href="{{ url_for('goals.hedef_listesi') }}">Tasarruf</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/borclar') }}" href="{{ url_for('debts.borc_listesi') }}">Borçlar</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/hatirlaticilar') }}" href="{{ url_for('reminders.liste') }}">Hatırlatıcılar</a></li>
+            <li class="nav-item"><a class="nav-link {{ aktif('/analiz') }}" href="{{ url_for('analytics.raporlar') }}">Analiz</a></li>
+          </ul>
+          <div class="d-flex align-items-center gap-3">
+            <span class="text-white small">{{ current_user.ad }}</span>
+            <a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.profil') }}">Profil</a>
+            <a class="btn btn-light btn-sm" href="{{ url_for('auth.cikis') }}">Çıkış</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+    <main class="py-4">
+      <div class="container">
+        {% with mesajlar = get_flashed_messages(with_categories=True) %}
+          {% if mesajlar %}
+            <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+              {% for kategori, mesaj in mesajlar %}
+              <div class="toast align-items-center text-bg-{{ 'warning' if kategori == 'message' else kategori }} border-0 show">
+                <div class="d-flex">
+                  <div class="toast-body">{{ mesaj }}</div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+    <footer class="bg-dark text-white py-3 mt-auto">
+      <div class="container text-center">
+        <small>&copy; {{ current_year|default(2024) }} Bütçe Rehberi - Kişisel Finans Yönetimi</small>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

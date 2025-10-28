@@ -1,0 +1,73 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Borç Takibi{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Borç Kaydı</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.ad.label(class="form-label") }}{{ form.ad(class="form-control") }}</div>
+          <div class="mb-3">{{ form.hesap_id.label(class="form-label") }}{{ form.hesap_id(class="form-select") }}</div>
+          <div class="mb-3">{{ form.toplam_tutar.label(class="form-label") }}{{ form.toplam_tutar(class="form-control") }}</div>
+          <div class="mb-3">{{ form.kalan_tutar.label(class="form-label") }}{{ form.kalan_tutar(class="form-control") }}</div>
+          <div class="mb-3">{{ form.faiz_orani.label(class="form-label") }}{{ form.faiz_orani(class="form-control") }}</div>
+          <div class="mb-3">{{ form.son_odeme_tarihi.label(class="form-label") }}{{ form.son_odeme_tarihi(class="form-control") }}</div>
+          <div class="mb-3">{{ form.minimum_odeme.label(class="form-label") }}{{ form.minimum_odeme(class="form-control") }}</div>
+          <div class="mb-3">{{ form.aciklama.label(class="form-label") }}{{ form.aciklama(class="form-control", rows=3) }}</div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Borç Özeti</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Başlık</th>
+              <th class="text-end">Kalan</th>
+              <th>Son Tarih</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for borc in borclar %}
+            <tr>
+              <td>
+                <strong>{{ borc.ad }}</strong>
+                <div class="small text-muted">Toplam: ₺{{ '%.2f'|format(borc.toplam_tutar) }}</div>
+              </td>
+              <td class="text-end">₺{{ '%.2f'|format(borc.kalan_tutar) }}</td>
+              <td>{{ borc.son_odeme_tarihi.strftime('%d/%m/%Y') if borc.son_odeme_tarihi else '-' }}</td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('debts.borc_odeme', borc_id=borc.id) }}" class="d-flex gap-2 align-items-center">
+                  {{ csrf_token() }}
+                  <input type="number" step="0.01" min="0" name="tutar" class="form-control form-control-sm" placeholder="₺">
+                  <input type="date" name="tarih" class="form-control form-control-sm" value="{{ borc.son_odeme_tarihi.strftime('%Y-%m-%d') if borc.son_odeme_tarihi else '' }}">
+                  <input type="text" name="aciklama" class="form-control form-control-sm" placeholder="Not">
+                  <button class="btn btn-sm btn-outline-success">Ödeme</button>
+                </form>
+                <form method="post" action="{{ url_for('debts.borc_sil', borc_id=borc.id) }}" class="mt-2">
+                  {{ csrf_token() }}
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Borç kaydı silinsin mi?')">Sil</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted">Hiç borç kaydı yok.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

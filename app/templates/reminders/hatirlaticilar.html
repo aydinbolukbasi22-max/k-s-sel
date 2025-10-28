@@ -1,0 +1,81 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Hatırlatıcılar{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Hatırlatıcı Ekle</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.baslik.label(class="form-label") }}{{ form.baslik(class="form-control") }}</div>
+          <div class="mb-3">{{ form.tutar.label(class="form-label") }}{{ form.tutar(class="form-control") }}</div>
+          <div class="mb-3">{{ form.son_tarih.label(class="form-label") }}{{ form.son_tarih(class="form-control") }}</div>
+          <div class="mb-3">{{ form.donem.label(class="form-label") }}{{ form.donem(class="form-select") }}</div>
+          <div class="form-check form-switch mb-3">
+            {{ form.aktif(class="form-check-input", role="switch") }}
+            {{ form.aktif.label(class="form-check-label") }}
+          </div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Planlanan Hatırlatıcılar</h5>
+        <div class="small text-muted">Bugün: {{ sayac.bugun }} · Yaklaşan: {{ sayac.yaklasan }} · Geciken: {{ sayac.gecmis }}</div>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Başlık</th>
+              <th>Son Tarih</th>
+              <th class="text-end">Tutar</th>
+              <th>Durum</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for kayit in hatirlaticilar %}
+            <tr>
+              <td>{{ kayit.baslik }}</td>
+              <td>{{ kayit.son_tarih.strftime('%d/%m/%Y') }}</td>
+              <td class="text-end">{{ kayit.tutar and ('₺%.2f'|format(kayit.tutar)) or '-' }}</td>
+              <td>
+                {% if not kayit.aktif %}
+                  <span class="badge bg-secondary">Pasif</span>
+                {% elif kayit.son_tarih < bugun %}
+                  <span class="badge bg-danger">Gecikti</span>
+                {% elif kayit.son_tarih == bugun %}
+                  <span class="badge bg-warning text-dark">Bugün</span>
+                {% else %}
+                  <span class="badge bg-success">Planlı</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('reminders.tamamla', hatirlatici_id=kayit.id) }}" class="d-inline">
+                  {{ tamamla_formu.hidden_tag() }}
+                  <input type="hidden" name="not_metni" value="Zamanında tamamlandı">
+                  <button class="btn btn-sm btn-outline-success">Tamamlandı</button>
+                </form>
+                <form method="post" action="{{ url_for('reminders.sil', hatirlatici_id=kayit.id) }}" class="d-inline ms-2">
+                  {{ csrf_token() }}
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Silinsin mi?')">Sil</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Hatırlatıcı bulunmuyor.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Tasarruf Hedefleri{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Yeni Hedef</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">{{ form.ad.label(class="form-label") }}{{ form.ad(class="form-control") }}</div>
+          <div class="mb-3">{{ form.hedef_tutar.label(class="form-label") }}{{ form.hedef_tutar(class="form-control") }}</div>
+          <div class="mb-3">{{ form.birikim.label(class="form-label") }}{{ form.birikim(class="form-control") }}</div>
+          <div class="mb-3">{{ form.hedef_tarih.label(class="form-label") }}{{ form.hedef_tarih(class="form-control") }}</div>
+          <div class="mb-3">{{ form.oncelik.label(class="form-label") }}{{ form.oncelik(class="form-control") }}</div>
+          <div class="mb-3">{{ form.aciklama.label(class="form-label") }}{{ form.aciklama(class="form-control", rows=3) }}</div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Hedef Durumları</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Hedef</th>
+              <th class="text-end">Birikim</th>
+              <th class="text-end">Hedef</th>
+              <th>İlerleme</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hedef in hedefler %}
+            <tr>
+              <td>
+                <strong>{{ hedef.ad }}</strong>
+                <div class="small text-muted">{{ hedef.hedef_tarih.strftime('%d/%m/%Y') if hedef.hedef_tarih }}</div>
+              </td>
+              <td class="text-end">₺{{ '%.2f'|format(hedef.birikim) }}</td>
+              <td class="text-end">₺{{ '%.2f'|format(hedef.hedef_tutar) }}</td>
+              <td>
+                <div class="progress" style="height: 10px;">
+                  <div class="progress-bar" role="progressbar" style="width: {{ ilerlemeler[hedef.id] }}%"></div>
+                </div>
+              </td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('goals.hedef_guncelle', hedef_id=hedef.id) }}" class="d-flex gap-2 align-items-center">
+                  {{ csrf_token() }}
+                  <input type="number" name="eklenen_tutar" step="0.01" min="0" class="form-control form-control-sm" placeholder="₺">
+                  <button class="btn btn-sm btn-outline-success">Ekle</button>
+                </form>
+                <form method="post" action="{{ url_for('goals.hedef_sil', hedef_id=hedef.id) }}" class="mt-2">
+                  {{ csrf_token() }}
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Hedef silinsin mi?')">Sil</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Henüz hedef eklenmedi.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

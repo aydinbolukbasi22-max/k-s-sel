@@ -1,0 +1,77 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Hesaplarım{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Yeni Hesap</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.ad.label(class="form-label") }}
+            {{ form.ad(class="form-control") }}
+            {% for hata in form.ad.errors %}<div class="text-danger small">{{ hata }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.tur.label(class="form-label") }}
+            {{ form.tur(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.bakiye.label(class="form-label") }}
+            {{ form.bakiye(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.aciklama.label(class="form-label") }}
+            {{ form.aciklama(class="form-control", rows=3) }}
+          </div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Hesap Bakiyeleri</h5>
+        <span class="badge bg-primary">Toplam: ₺{{ '%.2f'|format(toplam_bakiye) }}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Ad</th>
+              <th>Tür</th>
+              <th class="text-end">Bakiye</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for hesap in hesaplar %}
+            <tr>
+              <td>
+                <strong>{{ hesap.ad }}</strong>
+                <div class="text-muted small">{{ hesap.aciklama }}</div>
+              </td>
+              <td>{{ hesap.tur.value|replace('_', ' ')|title }}</td>
+              <td class="text-end fw-bold">₺{{ '%.2f'|format(hesap.bakiye) }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('ledger.hesap_duzenle', hesap_id=hesap.id) }}">Düzenle</a>
+                <form method="post" action="{{ url_for('ledger.hesap_sil', hesap_id=hesap.id) }}" class="d-inline">
+                  {{ csrf_token() }}
+                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bu hesabı silmek istediğinize emin misiniz?')">Sil</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted">Henüz hesap eklenmedi.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

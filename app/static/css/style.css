@@ -1,0 +1,50 @@
+body {
+  background: #f3f4f6;
+}
+
+.navbar-brand {
+  letter-spacing: 0.5px;
+}
+
+.gradient-card {
+  border-radius: 1rem;
+}
+
+.gradient-income {
+  background: linear-gradient(135deg, #20c997, #0d6efd);
+}
+
+.gradient-expense {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
+.gradient-balance {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+}
+
+.gradient-savings {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.renk-badge {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.table thead th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.toast {
+  min-width: 240px;
+}
+
+footer {
+  position: sticky;
+  bottom: 0;
+}

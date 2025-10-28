@@ -1,0 +1,115 @@
+{% extends 'layouts/base.html' %}
+{% block title %}İşlem Geçmişi{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Yeni İşlem</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.tarih.label(class="form-label") }}
+            {{ form.tarih(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.hesap_id.label(class="form-label") }}
+            {{ form.hesap_id(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.kategori_id.label(class="form-label") }}
+            {{ form.kategori_id(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.tur.label(class="form-label") }}
+            {{ form.tur(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            {{ form.tutar.label(class="form-label") }}
+            {{ form.tutar(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.aciklama.label(class="form-label") }}
+            {{ form.aciklama(class="form-control", rows=3) }}
+          </div>
+          <div class="d-grid">{{ form.gonder(class="btn btn-primary") }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex flex-wrap gap-2 justify-content-between align-items-center">
+        <h5 class="mb-0">İşlem Geçmişi</h5>
+        <a href="{{ url_for('ledger.islemleri_indir') }}" class="btn btn-sm btn-outline-secondary">CSV olarak indir</a>
+      </div>
+      <div class="card-body border-bottom">
+        <form method="get" class="row g-2 align-items-end">
+          {{ filtre_formu.hidden_tag() }}
+          <div class="col-md-4">
+            {{ filtre_formu.hesap_id.label(class="form-label") }}
+            {{ filtre_formu.hesap_id(class="form-select") }}
+          </div>
+          <div class="col-md-4">
+            {{ filtre_formu.kategori_id.label(class="form-label") }}
+            {{ filtre_formu.kategori_id(class="form-select") }}
+          </div>
+          <div class="col-md-4">
+            {{ filtre_formu.tur.label(class="form-label") }}
+            {{ filtre_formu.tur(class="form-select") }}
+          </div>
+          <div class="col-12 text-end">
+            {{ filtre_formu.gonder(class="btn btn-outline-primary") }}
+          </div>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Kategori</th>
+              <th>Hesap</th>
+              <th class="text-end">Tutar</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for islem in islemler %}
+            <tr>
+              <td>{{ islem.tarih.strftime('%d/%m/%Y') }}</td>
+              <td>{{ islem.kategori.ad if islem.kategori else 'Diğer' }}</td>
+              <td>{{ islem.hesap.ad }}</td>
+              <td class="text-end text-{{ 'success' if islem.tur.value == 'gelir' else 'danger' }} fw-bold">
+                {{ '+' if islem.tur.value == 'gelir' else '-' }}₺{{ '%.2f'|format(islem.tutar) }}
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('ledger.islem_duzenle', islem_id=islem.id) }}">Düzenle</a>
+                <form method="post" action="{{ url_for('ledger.islem_sil', islem_id=islem.id) }}" class="d-inline">
+                  {{ csrf_token() }}
+                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('İşlem silinsin mi?')">Sil</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Hiç işlem kaydedilmemiş.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer bg-white">
+        <h6>Aylık Kategori Özeti</h6>
+        <ul class="list-group list-group-flush">
+          {% for ad, tutar in aylik_ozet.items() %}
+          <li class="list-group-item d-flex justify-content-between"><span>{{ ad }}</span><span>₺{{ '%.2f'|format(tutar) }}</span></li>
+          {% else %}
+          <li class="list-group-item">Bu ay gider kaydı yok.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
