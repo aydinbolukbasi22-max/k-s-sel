@@ -68,7 +68,7 @@
                   <td>₺{{ '%.2f'|format(kalan) }}</td>
                   <td class="text-end">
                     <form method="post" action="{{ url_for('budgets.sil', butce_id=butce.id) }}" onsubmit="return confirm('Bütçeyi silmek istediğinize emin misiniz?');">
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      {{ csrf_token() }}
                       <button class="btn btn-sm btn-outline-danger">Sil</button>
                     </form>
                   </td>

@@ -62,7 +62,7 @@
             <td class="text-end">
               <a href="{{ url_for('accounts.duzenle', hesap_id=hesap.id) }}" class="btn btn-sm btn-outline-secondary">Düzenle</a>
               <form method="post" action="{{ url_for('accounts.sil', hesap_id=hesap.id) }}" class="d-inline" onsubmit="return confirm('Bu hesabı silmek istediğinize emin misiniz?');">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {{ csrf_token() }}
                 <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
               </form>
             </td>
