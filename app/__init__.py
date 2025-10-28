@@ -51,8 +51,4 @@ def create_app(config_class=None):
     app.register_blueprint(budgets_bp)
     app.register_blueprint(reports_bp)
 
-    # Veritabanı tablolarının varlığını garanti altına al
-    with app.app_context():
-        db.create_all()
-
     return app
