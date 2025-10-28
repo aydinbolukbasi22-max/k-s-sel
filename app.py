@@ -1,16 +1,15 @@
-"""Uygulamanın çalıştırılabilir giriş noktası."""
 from app import create_app, db
+from app.models import Kullanici, Hesap, Kategori, Islem, Butce
 
 app = create_app()
 
 
+@app.cli.command("veritabani-olustur")
+def veritabani_olustur():
+    """Veritabanı tablolarını oluşturur."""
+    db.create_all()
+    print("Veritabanı tabloları oluşturuldu.")
+
+
 if __name__ == "__main__":
-    with app.app_context():
-        try:
-            db.create_all()
-        except Exception as exc:  # pragma: no cover
-            app.logger.error("Veritabanı tabloları oluşturulamadı: %s", exc)
-            raise
-        else:
-            app.logger.info("Veritabanı tabloları hazır.")
     app.run(debug=True)

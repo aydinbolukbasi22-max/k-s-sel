@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Kategoriler{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Yeni Kategori</h2>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.ad.label(class="form-label") }}
+            {{ form.ad(class="form-control") }}
+            {% for hata in form.ad.errors %}
+              <div class="text-danger small">{{ hata }}</div>
+            {% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.aciklama.label(class="form-label") }}
+            {{ form.aciklama(class="form-control", rows=3) }}
+            {% for hata in form.aciklama.errors %}
+              <div class="text-danger small">{{ hata }}</div>
+            {% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Kategori Listesi</h2>
+        <div class="list-group">
+          {% for kategori in kategoriler %}
+            <div class="list-group-item d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold">{{ kategori.ad }}</div>
+                <div class="small text-muted">{{ kategori.aciklama or 'Açıklama yok.' }}</div>
+              </div>
+              <form method="post" action="{{ url_for('categories.sil', kategori_id=kategori.id) }}" onsubmit="return confirm('Kategoriyi silmek istediğinize emin misiniz?');">
+                {{ csrf_token() }}
+                <button class="btn btn-sm btn-outline-danger">Sil</button>
+              </form>
+            </div>
+          {% else %}
+            <p class="text-muted">Henüz kategori oluşturmadınız.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
