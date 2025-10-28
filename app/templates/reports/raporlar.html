@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Raporlar{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Detaylı Raporlar</h1>
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="post" class="row gy-3 gx-3 align-items-end" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="col-md-3">
+        {{ form.baslangic.label(class="form-label") }}
+        {{ form.baslangic(class="form-control") }}
+      </div>
+      <div class="col-md-3">
+        {{ form.bitis.label(class="form-label") }}
+        {{ form.bitis(class="form-control") }}
+      </div>
+      <div class="col-md-3">
+        {{ form.kategori_id.label(class="form-label") }}
+        {{ form.kategori_id(class="form-select") }}
+      </div>
+      <div class="col-md-3">
+        {{ form.hesap_id.label(class="form-label") }}
+        {{ form.hesap_id(class="form-select") }}
+      </div>
+      <div class="col-12 d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('reports.raporlar', export='csv') }}" class="btn btn-outline-secondary">CSV Olarak Dışa Aktar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Gelir</h2>
+        <p class="fs-3 text-success">₺{{ '%.2f'|format(toplam_gelir) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Gider</h2>
+        <p class="fs-3 text-danger">₺{{ '%.2f'|format(toplam_gider) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Net Durum</h2>
+        <p class="fs-3 {{ 'text-success' if net_durum >= 0 else 'text-danger' }}">₺{{ '%.2f'|format(net_durum) }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white">
+    <strong>Kategori Bazlı Dağılım</strong>
+  </div>
+  <div class="card-body">
+    <canvas id="kategoriGrafik"></canvas>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h2 class="h5 mb-3">İşlem Listesi</h2>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="table-light">
+          <tr>
+            <th>Tarih</th>
+            <th>Tür</th>
+            <th>Kategori</th>
+            <th>Hesap</th>
+            <th>Tutar</th>
+            <th>Açıklama</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for islem in islemler %}
+            <tr>
+              <td>{{ islem.tarih|turkce_tarih }}</td>
+              <td>{{ 'Gelir' if islem.islem_turu == 'gelir' else 'Gider' }}</td>
+              <td>{{ islem.kategori.ad }}</td>
+              <td>{{ islem.hesap.ad }}</td>
+              <td>₺{{ '%.2f'|format(islem.tutar) }}</td>
+              <td>{{ islem.aciklama or '-' }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6">Seçilen filtrelere uygun kayıt bulunamadı.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block ek_js %}
+<script>
+  const grafikVerisi = {{ grafik_verisi|tojson }};
+  const etiketler = Object.keys(grafikVerisi);
+  const gelirler = etiketler.map(etiket => grafikVerisi[etiket].gelir);
+  const giderler = etiketler.map(etiket => grafikVerisi[etiket].gider);
+  const ctx = document.getElementById('kategoriGrafik');
+  if (ctx && etiketler.length > 0) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etiketler,
+        datasets: [
+          {
+            label: 'Gelir',
+            backgroundColor: '#20c997',
+            data: gelirler,
+          },
+          {
+            label: 'Gider',
+            backgroundColor: '#dc3545',
+            data: giderler,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}
