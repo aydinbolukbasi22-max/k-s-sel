@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Hesap Düzenle{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Hesap Bilgilerini Güncelle</h1>
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="row g-3">
+        <div class="col-md-4">
+          {{ form.ad.label(class="form-label") }}
+          {{ form.ad(class="form-control") }}
+          {% for hata in form.ad.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-4">
+          {{ form.hesap_turu.label(class="form-label") }}
+          {{ form.hesap_turu(class="form-select") }}
+          {% for hata in form.hesap_turu.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-4">
+          {{ form.bakiye.label(class="form-label") }}
+          {{ form.bakiye(class="form-control") }}
+          {% for hata in form.bakiye.errors %}
+            <div class="text-danger small">{{ hata }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('accounts.listele') }}" class="btn btn-outline-secondary">İptal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
